@@ -31,7 +31,6 @@
         position: fixed;
         top: 50%;
         left: 50%;
-        /* bring your own prefixes */
         transform: translate(-50%, -50%);
       }
     </style>
@@ -42,34 +41,40 @@
 
     <script>
 
-    
-      
     navigator.geolocation.getCurrentPosition(function(location) {
       
       let latitude = location.coords.latitude;
       let longitude = location.coords.longitude;
 
-      let currentWeather;
-
       fetch(`https://fcc-weather-api.glitch.me/api/current?lat=${latitude}&lon=${longitude}`)
-      .then(response => response.json())
-      .then(function(data) {
-        let currentWeather = data;
+        .then(response => response.json())
+        .then(function(data) {
+          renderApp(data);
+      })
 
+      function renderApp(data) {
         let div = document.createElement('div');
         let h1 = document.createElement('h1');
         let h2 = document.createElement('h2');
         let h3 = document.createElement('h3');
         let span = document.createElement('span');
 
+        let degrees = data['main']['temp'];
+
+        h1.innerHTML = data['name'];
+        h2.innerHTML = degrees + ' °C';
+        h3.innerHTML = data['weather'][0]['main'];
+        span.innerHTML = `, ${data['sys']['country']}`;
+        
+        let img = document.createElement('img');
+        let value = data['weather'][0]['icon'];
+        img.src = value;
+
         let button = document.createElement('button');
         button.textContent = 'Toggle Fahrenheit';
 
-        let degrees = `${currentWeather['main']['temp']}`;
-
         button.addEventListener('click', function() {
           if ( h2.innerHTML === degrees + ' °C' ) {
-            let degrees = `${currentWeather['main']['temp']}`;
             h2.innerHTML = (degrees * 9/5 + 32) + ' F';
             button.textContent = 'Toggle Celcius';
           } else {
@@ -78,15 +83,6 @@
           }
         });
 
-        h1.innerHTML = `${currentWeather['name']}`;
-        h2.innerHTML = degrees + ' °C';
-        h3.innerHTML = `${currentWeather['weather'][0]['main']}`;
-        span.innerHTML = `, ${currentWeather['sys']['country']}`;
-        
-        let img = document.createElement('img');
-        let value = `${currentWeather['weather'][0]['icon']}`;
-        img.src = value;
-
         div.appendChild(h1);
         div.appendChild(h2);
         div.appendChild(h3);
@@ -94,8 +90,7 @@
         h3.appendChild(img);
         div.appendChild(button);
         document.body.appendChild(div);
-      })
-
+      }
     });
 
 
